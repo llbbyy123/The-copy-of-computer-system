@@ -1,0 +1,17 @@
+TESTCASE_SOURCE := $(shell find . -name *.S)
+TESTCASE_ELF := $(patsubst %.S,%.elf,$(TESTCASE_SOURCE))
+TESTCASE_ASM := $(patsubst %.S,%.asm,$(TESTCASE_SOURCE))
+TESTCASE_HEX := $(patsubst %.S,%.hex,$(TESTCASE_SOURCE))
+TESTCASE_OBJ := $(patsubst %.S,%.o,$(TESTCASE_SOURCE))
+
+all:
+	$(RISCV_GCC) $(RISCV_GCC_OPTS) -Tlink.ld $(TESTCASE_SOURCE) -o $(TESTCASE_ELF)
+	$(RISCV_GCC) $(RISCV_GCC_OPTS) -c $(TESTCASE_SOURCE)
+	$(RISCV_OBJDUMP) $(TESTCASE_ELF) > $(TESTCASE_ASM)
+	$(RISCV_OBJCOPY) $(TESTCASE_ELF) $(TESTCASE_HEX)
+	python3 ../endian.py $(TESTCASE_HEX)
+
+clean:
+	rm -f $(TESTCASE_ELF) $(TESTCASE_ASM) $(TESTCASE_HEX) $(TESTCASE_OBJ)
+	
+	
